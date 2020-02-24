@@ -1,12 +1,12 @@
 package com.anwarmuhamat
 
+import grails.converters.JSON
 import grails.rest.*
 
 class UserController extends RestfulController {
     def userService
     def authenticationService
-//    static responseFormats = ['json', 'xml']
-//    static allowedMethods = [login:'POST']
+    // static allowedMethods = [index:'GET']
 
     UserController() {
         super(User)
@@ -18,7 +18,8 @@ class UserController extends RestfulController {
         if (isValidToken.code != 200) {
             respond isValidToken
         } else {
-            respond userService.list(isValidToken.id)
+            response.status = 200
+            render userService.list(isValidToken.id) as JSON
         }
     }
 
@@ -29,8 +30,7 @@ class UserController extends RestfulController {
 
     @Override
     def save() {
-        def user = userService.save(request)
-        respond user
+        respond userService.save(request)
     }
 
     @Override

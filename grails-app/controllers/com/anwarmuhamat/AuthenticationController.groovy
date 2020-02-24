@@ -9,17 +9,7 @@ class AuthenticationController extends RestfulController {
         super(User)
     }
 
-    @Override
-    def index() {
-        def isValidToken = authenticationService.tokenVerifier(request)
-        if (isValidToken.code != 200) {
-            respond new Response(code: 401, message: 'Unauthorized.')
-        }
-        respond isValidToken
-    }
-
-    @Override
-    def save() {
+    def signIn() {
         respond authenticationService.issueToken(request)
     }
 
