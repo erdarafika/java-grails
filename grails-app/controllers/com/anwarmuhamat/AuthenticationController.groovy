@@ -1,6 +1,5 @@
 package com.anwarmuhamat
 
-
 import grails.rest.*
 
 class AuthenticationController extends RestfulController {
@@ -12,7 +11,11 @@ class AuthenticationController extends RestfulController {
 
     @Override
     def index() {
-        respond authenticationService.tokenVerifier(request)
+        def isValidToken = authenticationService.tokenVerifier(request)
+        if (isValidToken.code != 200) {
+            respond new Response(code: 401, message: 'Unauthorized.')
+        }
+        respond isValidToken
     }
 
     @Override

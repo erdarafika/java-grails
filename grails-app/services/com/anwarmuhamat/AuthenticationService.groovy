@@ -15,6 +15,7 @@ import java.sql.Timestamp
 
 class Response {
     Integer code
+    Integer id
     String token
     String message
 }
@@ -60,22 +61,25 @@ class AuthenticationService {
 
     def tokenVerifier(request) {
         String headerAuth = request.getHeader('Authorization')
-        try {
-            Algorithm algorithm = Algorithm.HMAC256("Kz5BhK8oKohCnj2UFewHWPPXw1bwW4HMm8tjiD259vS8iEGeDRC9")
-            JWTVerifier verifier = JWT.require(algorithm)
-                    .withIssuer("anwarmuhamat")
-                    .build() //Reusable verifier instance
-            verifier.verify(headerAuth)
+        if (!headerAuth) {
+            return new Response(code: 400, message: 'Authorization header is required.')
+        } else {
             try {
-                DecodedJWT jwtPayload = JWT.decode(headerAuth)
-                Claim claim = jwtPayload.getClaim('id')
-                System.out.println(claim.asInt())
-                return new Response(code: 200, token: headerAuth)
-            } catch (JWTDecodeException exception){
+                Algorithm algorithm = Algorithm.HMAC256("Kz5BhK8oKohCnj2UFewHWPPXw1bwW4HMm8tjiD259vS8iEGeDRC9")
+                JWTVerifier verifier = JWT.require(algorithm)
+                        .withIssuer("anwarmuhamat")
+                        .build()
+                verifier.verify(headerAuth)
+                try {
+                    DecodedJWT jwtPayload = JWT.decode(headerAuth)
+                    Claim claim = jwtPayload.getClaim('id')
+                    return new Response(code: 200, id: claim.asInt())
+                } catch (JWTDecodeException exception){
+                    return new Response(code: 400, message: exception.message)
+                }
+            } catch (JWTVerificationException exception){
                 return new Response(code: 400, message: exception.message)
             }
-        } catch (JWTVerificationException exception){
-            return new Response(code: 400, message: exception.message)
         }
     }
 

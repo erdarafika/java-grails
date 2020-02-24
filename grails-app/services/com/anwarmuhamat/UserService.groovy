@@ -6,8 +6,8 @@ import grails.gorm.transactions.Transactional
 class UserService {
     def authenticationService
 
-    def list() {
-        return User.findAll()
+    def list(Integer id) {
+        return User.findById(id)
     }
 
     def single(def params) {

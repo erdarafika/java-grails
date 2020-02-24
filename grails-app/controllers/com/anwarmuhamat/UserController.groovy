@@ -4,6 +4,7 @@ import grails.rest.*
 
 class UserController extends RestfulController {
     def userService
+    def authenticationService
 //    static responseFormats = ['json', 'xml']
 //    static allowedMethods = [login:'POST']
 
@@ -13,7 +14,12 @@ class UserController extends RestfulController {
 
     @Override
     def index() {
-        respond userService.list()
+        def isValidToken = authenticationService.tokenVerifier(request)
+        if (isValidToken.code != 200) {
+            respond isValidToken
+        } else {
+            respond userService.list(isValidToken.id)
+        }
     }
 
     @Override
